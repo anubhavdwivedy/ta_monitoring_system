@@ -1,0 +1,7 @@
+<h2>Your Logs</h2>
+<a href="/submit">Submit New Log</a>
+<ul>
+{% for log in logs %}
+  <li>{{ log[2] }} - {{ log[3] }} hrs - {{ '✅' if log[5] else '❌' }}</li>
+{% endfor %}
+</ul>
