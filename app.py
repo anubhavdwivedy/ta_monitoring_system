@@ -22,10 +22,14 @@ def get_week_date_range(week_label):
     sunday = monday + timedelta(days=6)
     return f"Week {week} ({monday.strftime('%b %d')}–{sunday.strftime('%d, %Y')})"
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
+def index():
+    return redirect('/login')
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None 
-
+    
     if request.method == 'POST':
         db = get_db()
         cursor = db.cursor()
