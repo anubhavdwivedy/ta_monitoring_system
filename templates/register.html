@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - TA Monitoring System</title>
+</head>
+<body>
+    <h2>Register New User</h2>
+
+    <form method="POST">
+        <label>Full Name:</label><br>
+        <input type="text" name="name" required><br><br>
+
+        <label>Email:</label><br>
+        <input type="email" name="email" required><br><br>
+
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br><br>
+
+        {% if session.get('is_admin') %}
+            <label><input type="checkbox" name="is_admin"> Register as Admin</label><br><br>
+        {% endif %}
+
+        <button type="submit">Register</button>
+    </form>
+
+    <br>
+    <a href="/">← Back to Login</a>
+</body>
+</html>
