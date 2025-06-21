@@ -107,15 +107,31 @@ def dashboard():
     logs = cursor.execute("SELECT * FROM logs WHERE user_id = ?", (session['user_id'],)).fetchall()
     return render_template("dashboard.html", logs=logs)
 
+from datetime import date
+
 @app.route('/submit', methods=['GET', 'POST'])
-def submit_log():
+def submit():
+    if 'user_id' not in session:
+        return redirect('/')
+
     if request.method == 'POST':
+        user_id = session['user_id']
+        date_str = request.form['date']
+        hours = int(request.form['hours'])
+        minutes = int(request.form['minutes'])
+        description = request.form['description']
+
+        # Convert to float hours
+        total_hours = hours + (minutes / 60)
+
         db = get_db()
-        db.execute("INSERT INTO logs (user_id, date, hours, description) VALUES (?, ?, ?, ?)",
-                   (session['user_id'], request.form['date'], request.form['hours'], request.form['description']))
+        db.execute("INSERT INTO logs (user_id, date, hours, description, approved) VALUES (?, ?, ?, ?, 0)",
+                   (user_id, date_str, total_hours, description))
         db.commit()
         return redirect('/dashboard')
-    return render_template("submit_log.html")
+
+    today = date.today().isoformat()
+    return render_template("submit_log.html", today=today)
 
 @app.route('/admin')
 def admin():
