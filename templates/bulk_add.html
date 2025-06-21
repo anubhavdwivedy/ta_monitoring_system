@@ -1,6 +1,17 @@
-<h2>Bulk Add TA Accounts (CSV Upload)</h2>
-<form method="POST" enctype="multipart/form-data">
-  <input type="file" name="csvfile" accept=".csv" required>
-  <button type="submit">Upload</button>
-</form>
-<a href="/admin">← Back to Admin Panel</a>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bulk Add TAs via CSV</title>
+</head>
+<body>
+    <h2> Bulk Add TA Accounts (CSV Upload)</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        <label>Select a CSV file (name, email, password):</label><br><br>
+        <input type="file" name="csvfile" accept=".csv" required><br><br>
+        <button type="submit">Upload</button>
+    </form>
+
+    <a href="/admin">← Back to Admin Panel</a>
+</body>
+</html>
