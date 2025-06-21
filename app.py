@@ -191,17 +191,34 @@ def summary():
 
     return render_template("summary.html", summary=result)
 
+@app.route('/manage-users')
+def manage_users():
+    if not session.get('is_admin'):
+        return redirect('/')
+    db = get_db()
+    users = db.execute("SELECT id, name, email, is_admin FROM users").fetchall()
+    return render_template("manage_users.html", users=users)
+
+@app.route('/delete-user/<int:user_id>', methods=['POST'])
+def delete_user(user_id):
+    if not session.get('is_admin'):
+        return redirect('/')
+
+    # Prevent admin from deleting themselves
+    if user_id == session.get('user_id'):
+        return "❌ You cannot delete your own account."
+
+    db = get_db()
+    db.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    db.commit()
+    return redirect('/manage-users')
+
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect('/')
     
-@app.route('/initdb')
-def initdb():
-    import init_db
-    return "✅ Database initialized."
-
 # Required for Render deployment
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
