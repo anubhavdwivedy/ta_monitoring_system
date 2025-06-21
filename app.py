@@ -129,6 +129,15 @@ def approve(log_id):
     db.commit()
     return redirect('/admin')
 
+@app.route('/reject/<int:log_id>')
+def reject(log_id):
+    if not session.get('is_admin'):
+        return redirect('/')
+    db = get_db()
+    db.execute("UPDATE logs SET approved = -1 WHERE id = ?", (log_id,))
+    db.commit()
+    return redirect('/admin')
+
 @app.route('/summary')
 def summary():
     if not session.get('is_admin'):
