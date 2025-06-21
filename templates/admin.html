@@ -6,9 +6,14 @@
 <body>
     <h2>Admin Dashboard</h2>
 
-    <p><a href="/summary">📊 View Weekly Summary</a> | <a href="/bulk_add">📁 Bulk Add TAs via CSV</a> | <a href="/logout">🚪 Logout</a></p>
+    <p>
+        <a href="/summary">📊 View Weekly Summary</a> |
+        <a href="/bulk_add">📁 Bulk Add TAs via CSV</a> |
+        <a href="/logout">🚪 Logout</a>
+    </p>
 
-    <h3>Pending Logs</h3>
+    <h3>Submitted Logs</h3>
+
     <table border="1" cellpadding="6">
         <tr>
             <th>TA Name</th>
@@ -16,8 +21,9 @@
             <th>Hours</th>
             <th>Description</th>
             <th>Status</th>
-            <th>Action</th>
+            <th>Actions</th>
         </tr>
+
         {% for log in logs %}
         <tr>
             <td>{{ log[1] }}</td>
@@ -25,15 +31,18 @@
             <td>{{ log[3] }}</td>
             <td>{{ log[4] }}</td>
             <td>
-                {% if log[5] %}
+                {% if log[5] == 1 %}
                     ✅ Approved
+                {% elif log[5] == -1 %}
+                    ❌ Rejected
                 {% else %}
-                    ❌ Pending
+                    ⏳ Pending
                 {% endif %}
             </td>
             <td>
-                {% if not log[5] %}
-                    <a href="/approve/{{ log[0] }}">Approve</a>
+                {% if log[5] == 0 or log[5] is none %}
+                    <a href="/approve/{{ log[0] }}">✅ Approve</a> |
+                    <a href="/reject/{{ log[0] }}">❌ Reject</a>
                 {% else %}
                     ---
                 {% endif %}
@@ -43,4 +52,3 @@
     </table>
 </body>
 </html>
-
