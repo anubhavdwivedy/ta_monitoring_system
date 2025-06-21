@@ -134,8 +134,12 @@ Jane Smith,jane@example.com,securepass456
 
 ## 👷‍♂️ Admin Tips
 
-* Default admin registration must be done manually (or via DB insert)
+* Log in using the **default admin account**: `admin@ta.com` with password `admin123`
+* After logging in, **go to the registration page (without logging out)** to create a new admin account
+* Then **log in with the new admin account**
+* Finally, go to the user management panel to **delete the default admin** for security
 * Admin dashboard: `/admin`
 * Summary dashboard: `/summary`
 
 ---
+
