@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, flash
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from collections import defaultdict
@@ -34,8 +34,10 @@ def login():
             session['user_id'] = user[0]
             session['is_admin'] = user[4]
             return redirect('/admin' if user[4] else '/dashboard')
-        return "Invalid login"
-    return render_template("login.html")
+        else:
+            error = "Invalid email or password. Please try again."
+
+    return render_template("login.html", error=error)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -61,11 +63,14 @@ def register():
 def bulk_add():
     if not session.get('is_admin'):
         return redirect('/')
-    
+
+    message = None
+
     if request.method == 'POST':
         file = request.files['csvfile']
-        if not file.filename.endswith('.csv'):
-            return "Please upload a .csv file"
+        if not file or not file.filename.endswith('.csv'):
+            message = "❌ Please upload a valid .csv file"
+            return render_template("bulk_add.html", message=message)
 
         stream = TextIOWrapper(file.stream, encoding='utf-8')
         reader = csv.DictReader(stream)
@@ -87,9 +92,16 @@ def bulk_add():
                 skipped.append(email)
 
         db.commit()
-        return f"✅ {added} TAs added. ⚠️ Skipped: {', '.join(skipped)}" if skipped else f"✅ {added} TAs added."
-    
-    return render_template("bulk_add.html")
+
+        message = (
+            f"✅ {added} TAs added. ⚠️ Skipped: {', '.join(skipped)}"
+            if skipped else
+            f"✅ {added} TAs added."
+        )
+
+    return render_template("bulk_add.html", message=message)
+
+
     
 @app.route('/dashboard')
 def dashboard():
