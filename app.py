@@ -3,6 +3,8 @@ import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from collections import defaultdict
+import csv
+from io import TextIOWrapper
 import traceback
 import os
 
@@ -11,6 +13,7 @@ app.secret_key = 'secret123'  # Use environment variable in production
 
 def get_db():
     return sqlite3.connect("database.db")
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -33,7 +36,10 @@ def register():
         name = request.form['name']
         email = request.form['email']
         password = generate_password_hash(request.form['password'])
+
+        # If admin checkbox is ticked, this will be 1; else 0
         is_admin = 1 if 'is_admin' in request.form else 0
+
         db = get_db()
         try:
             db.execute("INSERT INTO users (name, email, password, is_admin) VALUES (?, ?, ?, ?)",
@@ -44,6 +50,40 @@ def register():
             return "Email already registered!"
     return render_template("register.html")
 
+@app.route('/bulk_add', methods=['GET', 'POST'])
+def bulk_add():
+    if not session.get('is_admin'):
+        return redirect('/')
+    
+    if request.method == 'POST':
+        file = request.files['csvfile']
+        if not file.filename.endswith('.csv'):
+            return "Please upload a .csv file"
+
+        stream = TextIOWrapper(file.stream, encoding='utf-8')
+        reader = csv.DictReader(stream)
+
+        db = get_db()
+        added = 0
+        skipped = []
+
+        for row in reader:
+            name = row['name'].strip()
+            email = row['email'].strip()
+            password = generate_password_hash(row['password'].strip())
+
+            try:
+                db.execute("INSERT INTO users (name, email, password, is_admin) VALUES (?, ?, ?, 0)",
+                           (name, email, password))
+                added += 1
+            except sqlite3.IntegrityError:
+                skipped.append(email)
+
+        db.commit()
+        return f"✅ {added} TAs added. ⚠️ Skipped: {', '.join(skipped)}" if skipped else f"✅ {added} TAs added."
+    
+    return render_template("bulk_add.html")
+    
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session or session.get('is_admin'):
