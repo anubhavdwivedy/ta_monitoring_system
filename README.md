@@ -23,7 +23,7 @@ This is a web-based system for managing and monitoring weekly Teaching Assistant
 * **Backend**: Flask (Python)
 * **Database**: SQLite3
 * **Password Hashing**: Werkzeug
-* **Deployment**: Render.com or local server
+* **Deployment**: Render.com, PythonAnywhere, or local server
 
 ---
 
@@ -112,6 +112,31 @@ ta-monitoring-system/
 
 ---
 
+### 🐍 Deploy to PythonAnywhere
+
+1. Sign up at [https://www.pythonanywhere.com](https://www.pythonanywhere.com)
+2. Upload your project files via the PythonAnywhere **Files** tab or using Git.
+3. Create a **virtual environment** and install dependencies:
+
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+4. Initialize the database:
+
+   ```bash
+   python init_db.py
+   ```
+5. Go to the **Web** tab and create a new web app.
+6. Set the **WSGI configuration file** to point to your `app.py`.
+7. Set the working directory, and environment variables (e.g., `SECRET_KEY`).
+8. Reload the web app.
+
+More info: [https://help.pythonanywhere.com/pages/Flask/](https://help.pythonanywhere.com/pages/Flask/)
+
+---
+
 ## 📄 CSV Format for Bulk TA Upload
 
 Use a `.csv` file like:
@@ -142,4 +167,3 @@ Jane Smith,jane@example.com,securepass456
 * Summary dashboard: `/summary`
 
 ---
-
