@@ -1,37 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Submit TA Log</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Weekly Summary - TA Monitoring</title>
 </head>
 <body>
+    <h2>📊 Weekly Summary of Approved Logs</h2>
 
-    <h2>📝 Submit Work Log</h2>
+    <p><a href="/admin">← Back to Admin Dashboard</a> | <a href="/logout">🚪 Logout</a></p>
 
-    <form method="POST">
-        <label for="date">Date:</label>
-        <input type="date" name="date" value="{{ today }}" required>
+    <table border="1" cellpadding="6">
+        <tr>
+            <th>TA Name</th>
+            <th>Week</th>
+            <th>Total Hours</th>
+        </tr>
+        {% for name, week_label, total_hours in data %}
+        <tr>
+            <td>{{ name }}</td>
+            <td>{{ week_label }}</td>
+            <td>{{ total_hours }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 
-        <label for="hours">Hours Worked:</label>
-        <select name="hours" required>
-            <option value="" disabled selected>-- Select hours --</option>
-            {% for i in range(1, 33) %}
-                {% set val = (i * 0.25) %}
-                <option value="{{ val }}">{{ "{:.2f}".format(val) }} hour{{ 's' if val > 1 else '' }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="description">Task Description:</label>
-        <textarea name="description" rows="4" placeholder="Briefly describe the TA work done..." required></textarea>
-
-        <button type="submit">📤 Submit Log</button>
-    </form>
-
-    <br>
-    <a href="/dashboard">← Back to Dashboard</a> |
-    <a href="/logout">🚪 Logout</a>
-
+    {% if not data %}
+    <p>No approved logs found yet.</p>
+    {% endif %}
 </body>
 </html>
-
-
