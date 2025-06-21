@@ -5,6 +5,7 @@ from datetime import datetime
 from collections import defaultdict
 import csv
 from io import TextIOWrapper
+from datetime import datetime, timedelta
 import traceback
 import os
 
@@ -13,6 +14,19 @@ app.secret_key = 'secret123'  # Use environment variable in production
 
 def get_db():
     return sqlite3.connect("database.db")
+
+def get_week_date_range(week_label):
+    """Convert 'YYYY-Www' to a date range string like 'Week 25 (June 16–22, 2025)'."""
+    year, week = week_label.split('-W')
+    year = int(year)
+    week = int(week)
+
+    # Get the Monday of that ISO week
+    monday = datetime.fromisocalendar(year, week, 1)
+    sunday = monday + timedelta(days=6)
+
+    return f"Week {week} ({monday.strftime('%b %d')}–{sunday.strftime('%d, %Y')})"
+
 
 
 @app.route('/', methods=['GET', 'POST'])
