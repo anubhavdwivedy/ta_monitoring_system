@@ -4,9 +4,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from collections import defaultdict
 import traceback
+import os
 
 app = Flask(__name__)
-app.secret_key = 'secret123'
+app.secret_key = 'secret123'  # Use environment variable in production
 
 def get_db():
     return sqlite3.connect("database.db")
@@ -111,3 +112,8 @@ def summary():
 def logout():
     session.clear()
     return redirect('/')
+
+# Required for Render deployment
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
