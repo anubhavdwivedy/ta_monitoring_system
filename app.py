@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, session
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
 from collections import defaultdict
+from datetime import datetime, timedelta
 import csv
 from io import TextIOWrapper
 from datetime import datetime, timedelta
@@ -16,18 +16,11 @@ def get_db():
     return sqlite3.connect("database.db")
 
 def get_week_date_range(week_label):
-    """Convert 'YYYY-Www' to a date range string like 'Week 25 (June 16–22, 2025)'."""
-    year, week = week_label.split('-W')
-    year = int(year)
-    week = int(week)
-
-    # Get the Monday of that ISO week
+    """Convert 'YYYY-Www' to readable format."""
+    year, week = map(int, week_label.split('-W'))
     monday = datetime.fromisocalendar(year, week, 1)
     sunday = monday + timedelta(days=6)
-
     return f"Week {week} ({monday.strftime('%b %d')}–{sunday.strftime('%d, %Y')})"
-
-
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -174,23 +167,29 @@ def summary():
         return redirect('/')
 
     db = get_db()
-    raw_data = db.execute("""
-        SELECT users.name, strftime('%Y-W%W', date) as week, SUM(hours)
+    cursor = db.cursor()
+    cursor.execute("""
+        SELECT users.name, date, hours
         FROM logs
         JOIN users ON logs.user_id = users.id
         WHERE approved = 1
-        GROUP BY users.name, week
-        ORDER BY week
-    """).fetchall()
+    """)
+    data = cursor.fetchall()
 
-    # Format week labels
-    summary_data = []
-    for row in raw_data:
-        name, week_label, total_hours = row
-        readable_week = get_week_date_range(week_label)
-        summary_data.append((name, readable_week, round(total_hours, 2)))
+    summary_data = defaultdict(lambda: defaultdict(float))
+    for name, date_str, hours in data:
+        date = datetime.strptime(date_str, '%Y-%m-%d')
+        week_key = f"{date.strftime('%Y')}-W{date.isocalendar()[1]}"
+        summary_data[name][week_key] += hours
 
-    return render_template("summary.html", data=summary_data)
+    result = []
+    for name in sorted(summary_data):
+        for week in sorted(summary_data[name]):
+            total = summary_data[name][week]
+            readable_week = get_week_date_range(week)
+            result.append((name, readable_week, round(total, 2)))
+
+    return render_template("summary.html", summary=result)
 
 
 @app.route('/logout')
