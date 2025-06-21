@@ -1,6 +1,26 @@
-<form method="post">
-  <input type="date" name="date" required>
-  <input type="number" step="0.5" name="hours" required>
-  <textarea name="description" placeholder="Work details..." required></textarea>
-  <button type="submit">Submit</button>
-</form>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit TA Log</title>
+</head>
+<body>
+    <h2>Submit Work Log</h2>
+
+    <form method="POST">
+        <label for="date">Date:</label><br>
+        <input type="date" name="date" required><br><br>
+
+        <label for="hours">Hours Worked:</label><br>
+        <input type="number" name="hours" step="0.1" min="0" max="24" required><br><br>
+
+        <label for="description">Task Description:</label><br>
+        <textarea name="description" rows="4" cols="50" placeholder="Describe the work you did..." required></textarea><br><br>
+
+        <button type="submit">Submit Log</button>
+    </form>
+
+    <br>
+    <a href="/dashboard">← Back to Dashboard</a> |
+    <a href="/logout">🚪 Logout</a>
+</body>
+</html>
