@@ -1,7 +1,39 @@
-<h2>Your Logs</h2>
-<a href="/submit">Submit New Log</a>
-<ul>
-{% for log in logs %}
-  <li>{{ log[2] }} - {{ log[3] }} hrs - {{ '✅' if log[5] else '❌' }}</li>
-{% endfor %}
-</ul>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TA Dashboard</title>
+</head>
+<body>
+    <h2>Welcome to Your TA Dashboard</h2>
+
+    <p>
+        <a href="/submit">➕ Submit New Log</a> |
+        <a href="/logout">🚪 Logout</a>
+    </p>
+
+    <h3>Your Submitted Logs</h3>
+
+    <table border="1" cellpadding="6">
+        <tr>
+            <th>Date</th>
+            <th>Hours</th>
+            <th>Description</th>
+            <th>Status</th>
+        </tr>
+        {% for log in logs %}
+        <tr>
+            <td>{{ log[2] }}</td>
+            <td>{{ log[3] }}</td>
+            <td>{{ log[4] }}</td>
+            <td>
+                {% if log[5] %}
+                    ✅ Approved
+                {% else %}
+                    ⏳ Pending
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
