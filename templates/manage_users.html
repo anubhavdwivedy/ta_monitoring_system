@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Users</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h2>👥 User Management</h2>
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user['name'] }}</td>
+                <td>{{ user['email'] }}</td>
+                <td>{{ 'Admin' if user['is_admin'] else 'TA' }}</td>
+                <td>
+                    {% if user['id'] != session['user_id'] %}
+                    <form method="POST" action="{{ url_for('delete_user', user_id=user['id']) }}" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                        <button type="submit" class="button danger">🗑️ Delete</button>
+                    </form>
+                    {% else %}
+                        <span style="color: grey;">(You)</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="nav-footer">
+        <a href="/admin" class="button">← Back to Admin</a>
+    </div>
+</div>
+</body>
+</html>
