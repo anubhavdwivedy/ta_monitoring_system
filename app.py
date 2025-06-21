@@ -152,6 +152,11 @@ def summary():
 def logout():
     session.clear()
     return redirect('/')
+    
+@app.route('/initdb')
+def initdb():
+    import init_db
+    return "✅ Database initialized."
 
 # Required for Render deployment
 if __name__ == '__main__':
