@@ -4,15 +4,23 @@
     <title>Bulk Add TAs via CSV</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <h2> 📂 Bulk Add TA Accounts (CSV Upload)</h2>
+<body class="container">
+    <h2>📂 Bulk Add TA Accounts (CSV Upload)</h2>
+
+    {% if message %}
+        <div style="color: green; margin-bottom: 15px; font-weight: bold;">
+            {{ message }}
+        </div>
+    {% endif %}
 
     <form method="POST" enctype="multipart/form-data">
-        <label>Select a CSV file (name, email, password):</label><br><br>
+        <label>Select a CSV file with headers: <code>name,email,password</code></label><br><br>
         <input type="file" name="csvfile" accept=".csv" required><br><br>
-        <button type="submit">Upload</button>
+        <button type="submit" class="button">📤 Upload</button>
     </form>
 
-    <a href="/admin">← Back to Admin Panel</a>
+    <br>
+    <a href="/admin" class="button">← Back to Admin Panel</a>
 </body>
 </html>
+
