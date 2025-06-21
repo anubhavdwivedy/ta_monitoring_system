@@ -1,8 +1,46 @@
-<h2>All Logs</h2>
-<ul>
-{% for log in logs %}
-  <li>{{ log[1] }} - {{ log[2] }} - {{ log[3] }} hrs - {{ log[4] }} - {{ '✅' if log[5] else '❌' }}
-  {% if not log[5] %}<a href="/approve/{{ log[0] }}">Approve</a>{% endif %}
-  </li>
-{% endfor %}
-</ul>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard - TA Monitoring</title>
+</head>
+<body>
+    <h2>Admin Dashboard</h2>
+
+    <p><a href="/summary">📊 View Weekly Summary</a> | <a href="/bulk_add">📁 Bulk Add TAs via CSV</a> | <a href="/logout">🚪 Logout</a></p>
+
+    <h3>Pending Logs</h3>
+    <table border="1" cellpadding="6">
+        <tr>
+            <th>TA Name</th>
+            <th>Date</th>
+            <th>Hours</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        {% for log in logs %}
+        <tr>
+            <td>{{ log[1] }}</td>
+            <td>{{ log[2] }}</td>
+            <td>{{ log[3] }}</td>
+            <td>{{ log[4] }}</td>
+            <td>
+                {% if log[5] %}
+                    ✅ Approved
+                {% else %}
+                    ❌ Pending
+                {% endif %}
+            </td>
+            <td>
+                {% if not log[5] %}
+                    <a href="/approve/{{ log[0] }}">Approve</a>
+                {% else %}
+                    ---
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+
