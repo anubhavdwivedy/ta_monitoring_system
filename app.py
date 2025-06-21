@@ -24,12 +24,15 @@ def get_week_date_range(week_label):
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    error = None 
+
     if request.method == 'POST':
         db = get_db()
         cursor = db.cursor()
         email = request.form['email']
         password = request.form['password']
         user = cursor.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+
         if user and check_password_hash(user[3], password):
             session['user_id'] = user[0]
             session['is_admin'] = user[4]
@@ -38,6 +41,7 @@ def login():
             error = "Invalid email or password. Please try again."
 
     return render_template("login.html", error=error)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
