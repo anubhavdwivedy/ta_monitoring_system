@@ -7,6 +7,7 @@
 <body>
 <div class="container">
     <h2>👥 User Management</h2>
+
     <table class="summary-table">
         <thead>
             <tr>
@@ -19,12 +20,12 @@
         <tbody>
         {% for user in users %}
             <tr>
-                <td>{{ user['name'] }}</td>
-                <td>{{ user['email'] }}</td>
-                <td>{{ 'Admin' if user['is_admin'] else 'TA' }}</td>
+                <td>{{ user[1] }}</td> <!-- name -->
+                <td>{{ user[2] }}</td> <!-- email -->
+                <td>{{ 'Admin' if user[3] else 'TA' }}</td> <!-- is_admin -->
                 <td>
-                    {% if user['id'] != session['user_id'] %}
-                    <form method="POST" action="{{ url_for('delete_user', user_id=user['id']) }}" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                    {% if user[0] != session['user_id'] %}
+                    <form method="POST" action="{{ url_for('delete_user', user_id=user[0]) }}" onsubmit="return confirm('Are you sure you want to delete this user?');">
                         <button type="submit" class="button danger">🗑️ Delete</button>
                     </form>
                     {% else %}
