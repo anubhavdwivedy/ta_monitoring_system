@@ -1,8 +1,0 @@
-<h2>All Logs</h2>
-<ul>
-{% for log in logs %}
-  <li>{{ log[1] }} - {{ log[2] }} - {{ log[3] }} hrs - {{ log[4] }} - {{ '✅' if log[5] else '❌' }}
-  {% if not log[5] %}<a href="/approve/{{ log[0] }}">Approve</a>{% endif %}
-  </li>
-{% endfor %}
-</ul>
