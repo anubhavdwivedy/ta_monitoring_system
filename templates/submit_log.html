@@ -12,14 +12,21 @@
         <label for="date">Date:</label>
         <input type="date" name="date" value="{{ today }}" required>
 
-        <label for="hours">Hours Worked:</label>
+        <label>Hours Worked:</label><br>
         <select name="hours" required>
-            <option value="" disabled selected>-- Select hours --</option>
-            {% for i in range(1, 33) %}
-                {% set val = (i * 0.25) %}
-                <option value="{{ val }}">{{ "{:.2f}".format(val) }} hour{{ 's' if val > 1 else '' }}</option>
+            <option value="" disabled selected>Hours</option>
+            {% for h in range(0, 9) %}
+                <option value="{{ h }}">{{ h }}</option>
             {% endfor %}
         </select>
+
+        <select name="minutes" required>
+            <option value="" disabled selected>Minutes</option>
+            {% for m in [0, 15, 30, 45] %}
+                <option value="{{ m }}">{{ m }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
 
         <label for="description">Task Description:</label>
         <textarea name="description" rows="4" placeholder="Briefly describe the TA work done..." required></textarea>
@@ -33,3 +40,4 @@
 
 </body>
 </html>
+
