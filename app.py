@@ -156,20 +156,26 @@ def reject(log_id):
 def summary():
     if not session.get('is_admin'):
         return redirect('/')
+
     db = get_db()
-    cursor = db.cursor()
-    cursor.execute("SELECT users.name, date, hours FROM logs JOIN users ON logs.user_id = users.id WHERE approved = 1")
-    data = cursor.fetchall()
-    summary_data = defaultdict(lambda: defaultdict(float))
-    for name, date_str, hours in data:
-        date = datetime.strptime(date_str, '%Y-%m-%d')
-        week = f"{date.strftime('%Y')}-W{date.isocalendar()[1]}"
-        summary_data[name][week] += hours
-    result = []
-    for name, weeks in summary_data.items():
-        for week, total in weeks.items():
-            result.append((name, week, round(total, 2)))
-    return render_template("summary.html", summary=result)
+    raw_data = db.execute("""
+        SELECT users.name, strftime('%Y-W%W', date) as week, SUM(hours)
+        FROM logs
+        JOIN users ON logs.user_id = users.id
+        WHERE approved = 1
+        GROUP BY users.name, week
+        ORDER BY week
+    """).fetchall()
+
+    # Format week labels
+    summary_data = []
+    for row in raw_data:
+        name, week_label, total_hours = row
+        readable_week = get_week_date_range(week_label)
+        summary_data.append((name, readable_week, round(total_hours, 2)))
+
+    return render_template("summary.html", data=summary_data)
+
 
 @app.route('/logout')
 def logout():
