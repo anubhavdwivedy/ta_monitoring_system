@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, session, flash
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import csv
 from io import TextIOWrapper
 from datetime import datetime, timedelta
@@ -120,7 +120,6 @@ def dashboard():
     logs = cursor.execute("SELECT * FROM logs WHERE user_id = ?", (session['user_id'],)).fetchall()
     return render_template("dashboard.html", logs=logs)
 
-from datetime import date
 
 @app.route('/submit', methods=['GET', 'POST'])
 def submit():
@@ -145,6 +144,55 @@ def submit():
 
     today = date.today().isoformat()
     return render_template("submit_log.html", today=today)
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    if not session.get('user_id'):
+        return redirect('/')
+
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        hashed_pw = generate_password_hash(new_password)
+        db = get_db()
+        db.execute("UPDATE users SET password = ? WHERE id = ?", (hashed_pw, session['user_id']))
+        db.commit()
+        return redirect('/dashboard')
+
+    return render_template("reset_password.html")
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        message = request.form['message']
+        db = get_db()
+        db.execute("INSERT INTO reset_requests (email, message) VALUES (?, ?)", (email, message))
+        db.commit()
+        return "Request submitted. Please wait for admin approval."
+    return render_template("forgot_password.html")
+
+@app.route('/admin-requests')
+def admin_requests():
+    if not session.get('is_admin'):
+        return redirect('/')
+    db = get_db()
+    requests = db.execute("SELECT * FROM reset_requests").fetchall()
+    return render_template("admin_requests.html", requests=requests)
+
+@app.route('/approve-reset/<int:req_id>', methods=['POST'])
+def approve_reset(req_id):
+    if not session.get('is_admin'):
+        return redirect('/')
+    new_password = request.form['new_password']
+    hashed_pw = generate_password_hash(new_password)
+
+    db = get_db()
+    request_data = db.execute("SELECT email FROM reset_requests WHERE id = ?", (req_id,)).fetchone()
+    if request_data:
+        db.execute("UPDATE users SET password = ? WHERE email = ?", (hashed_pw, request_data['email']))
+        db.execute("DELETE FROM reset_requests WHERE id = ?", (req_id,))
+        db.commit()
+    return redirect('/admin-requests')
 
 @app.route('/admin')
 def admin():
