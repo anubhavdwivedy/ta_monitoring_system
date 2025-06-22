@@ -156,7 +156,7 @@ def reset_password():
         db = get_db()
         db.execute("UPDATE users SET password = ? WHERE id = ?", (hashed_pw, session['user_id']))
         db.commit()
-        return redirect('/dashboard')
+        return redirect('/dashboard' if not session.get('is_admin') else '/admin')
 
     return render_template("reset_password.html")
 
@@ -175,27 +175,35 @@ def forgot_password():
 
     return render_template('forgot_password.html')
 
+
 @app.route('/admin-requests')
 def admin_requests():
     if not session.get('is_admin'):
         return redirect('/')
+
     db = get_db()
+    db.row_factory = sqlite3.Row  # Enable dict-style access
     requests = db.execute("SELECT * FROM reset_requests").fetchall()
     return render_template("admin_requests.html", requests=requests)
+
 
 @app.route('/approve-reset/<int:req_id>', methods=['POST'])
 def approve_reset(req_id):
     if not session.get('is_admin'):
         return redirect('/')
+
     new_password = request.form['new_password']
     hashed_pw = generate_password_hash(new_password)
 
     db = get_db()
+    db.row_factory = sqlite3.Row  # Enable dict-style access
     request_data = db.execute("SELECT email FROM reset_requests WHERE id = ?", (req_id,)).fetchone()
+
     if request_data:
         db.execute("UPDATE users SET password = ? WHERE email = ?", (hashed_pw, request_data['email']))
         db.execute("DELETE FROM reset_requests WHERE id = ?", (req_id,))
         db.commit()
+
     return redirect('/admin-requests')
 
 @app.route('/admin')
