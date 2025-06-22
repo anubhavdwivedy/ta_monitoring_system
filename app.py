@@ -160,16 +160,20 @@ def reset_password():
 
     return render_template("reset_password.html")
 
+
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
         email = request.form['email']
         message = request.form['message']
+
         db = get_db()
         db.execute("INSERT INTO reset_requests (email, message) VALUES (?, ?)", (email, message))
         db.commit()
-        return "Request submitted. Please wait for admin approval."
-    return render_template("forgot_password.html")
+
+        return render_template('login.html', success="Request submitted. Please wait for admin approval.")
+
+    return render_template('forgot_password.html')
 
 @app.route('/admin-requests')
 def admin_requests():
