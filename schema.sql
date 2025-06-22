@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
@@ -6,7 +6,7 @@ CREATE TABLE users (
     is_admin BOOLEAN DEFAULT 0
 );
 
-CREATE TABLE logs (
+CREATE TABLE IF NOT EXISTS logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     date TEXT,
@@ -14,4 +14,10 @@ CREATE TABLE logs (
     description TEXT,
     approved BOOLEAN DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS reset_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    message TEXT NOT NULL
 );
